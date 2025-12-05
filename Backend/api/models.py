@@ -2,6 +2,8 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.utils import timezone
 from datetime import timedelta
+from decimal import Decimal
+
 
 # Create your models here.
 
@@ -12,7 +14,7 @@ class Client(models.Model):
     city = models.CharField(max_length=256)
     phone_number = models.CharField(max_length=10)
     sign_in_date = models.DateField(auto_now_add=True)
-    postal_code = models.IntegerField()
+    adress= models.CharField(max_length=256,blank=True )
     # fk
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="client_profile")
 
@@ -40,6 +42,17 @@ class Product(models.Model):
 
     def __str__(self):
         return f"{self.name}"
+    @property
+    def discounted_price(self):
+        """
+        Prix après promotion.
+        Si promotion = 0 -> retourne current_price.
+        Si promotion = 20 -> applique -20%.
+        """
+        if self.promotion and self.promotion > 0:
+            discount_factor = (Decimal("100") - self.promotion) / Decimal("100")
+            return (self.current_price * discount_factor).quantize(Decimal("0.01"))
+        return self.current_price
     
 # Comment
 class Comment(models.Model):
@@ -68,14 +81,34 @@ def get_default_planned_date():
 class Order(models.Model):
     status = models.CharField(max_length=20, choices=ORDER_STATUS_CHOICES, default='pending')
     order_date = models.DateField(auto_now_add=True)
-    delivery_planned_date = models.DateField(default=get_default_planned_date) 
-    delivery_date = models.DateField(null=True, blank=True) 
+    delivery_planned_date = models.DateField(default=get_default_planned_date)
+    delivery_date = models.DateField(null=True, blank=True)
     total_amount = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+
+    # nouveaux champs
+    shipping_type = models.CharField(
+        max_length=20,
+        choices=[("store", "Retrait en magasin"), ("home", "Livraison à domicile")],
+        default="store",
+    )
+    shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
+    payment_type = models.CharField(
+        max_length=20,
+        choices=[
+            ("cash", "Cash"),
+            ("card", "Card"),
+            ("paypal", "PayPal"),
+            ("bank_transfer", "Bank Transfer"),
+        ],
+        default="cash",
+    )
+
     # fk
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name="orders")
 
     def __str__(self):
         return f"Order #{self.id} - {self.client.user.username}"
+
     
 # Payment type choice
 PAYMENT_TYPE_CHOICES = [
@@ -95,19 +128,22 @@ class Payment(models.Model):
     type = models.CharField(max_length=20, choices=PAYMENT_TYPE_CHOICES, default='cash')
     payment_date = models.DateField(auto_now_add=True)
     value = models.DecimalField(max_digits=10, decimal_places=2)
-    # fk
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name="payment")
-
+    invoice_pdf = models.FileField(upload_to="invoices/", null=True, blank=True)
+    invoice_sent = models.BooleanField(default=False)
     def __str__(self):
-        return f"Payment for Order #{self.order.id} - {self.status}"
+        return f"Payment for Order #{self.order.id}" #- {self.status}"
+
 
 # Order_Product
 class OrderProduct(models.Model):
     quantity = models.IntegerField()
     oneself_price = models.DecimalField(max_digits=10, decimal_places=2) 
-    # fk
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name="order_products")
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name="order_products")
+    shipping_type = models.CharField(max_length=20, blank=True, null=True)
+    shipping_cost = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    payment_type = models.CharField(max_length=20, blank=True, null=True)
 
     class Meta:
         # Assure qu'un produit ne peut être ajouté qu'une seule fois par commande (la quantité est mise à jour)

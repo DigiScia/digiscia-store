@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'api',
     'rest_framework_simplejwt',
+
 ]
 
 MIDDLEWARE = [
@@ -147,12 +148,20 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # Configuration pour les envois de mail
 from decouple import config
 
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = config('EMAIL_HOST')
-EMAIL_PORT = config('EMAIL_PORT', cast=int)
-EMAIL_USE_TLS = config('EMAIL_USE_TLS', cast=bool)
-EMAIL_HOST_USER = config('EMAIL_HOST_USER')
-EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')
+import os
+
+EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+
+EMAIL_HOST = "smtp.gmail.com"
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+
+EMAIL_HOST_USER = "siehonarcisse@gmail.com"
+EMAIL_HOST_PASSWORD = "tvpdurzykeefjtgh"
+
+DEFAULT_FROM_EMAIL = f"DigiScia <{EMAIL_HOST_USER}>"
+
+
 
 # Configuration Django REST Framework avec JWT
 REST_FRAMEWORK = {
@@ -167,7 +176,7 @@ REST_FRAMEWORK = {
 from datetime import timedelta
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=30),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=300),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
 
@@ -231,3 +240,5 @@ JAZZMIN_SETTINGS = {
     # Optionnel : empêche d'afficher le bouton "UI Builder" si présent
     "show_ui_builder": False,
 }
+
+

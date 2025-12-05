@@ -35,8 +35,9 @@ urlpatterns = [
     path('orders/<int:pk>/', views.order_detail_view, name='order_detail'),
 
     # URLs pour les paiements
-    path('orders/<int:order_pk>/payment/', views.payment_list_create_view, name='payment_list_create'),
-    
+    #path('orders/<int:order_pk>/payment/', views.payment_list_create_view, name='payment_list_create'),
+    path('orders/<int:order_pk>/payment/', views.order_pay_view, name='payment_list_create'),
+
     # Send emails
     path('send-email/', views.send_email, name='send_email'),
 

@@ -144,14 +144,21 @@ def category_detail_view(request, pk):
 # Product
 # Get product list
 @api_view(['GET'])
-@permission_classes([AllowAny]) # GET pour tous, POST pour IsAdminUser
+@permission_classes([AllowAny])
 def product_list_view(request):
     """
-    Liste tous les produits ou en crée un nouveau.
+    Liste tous les produits, avec filtre par catégorie si ?category=<id> est fourni.
     """
     products = Product.objects.all()
+
+    # 🔹 Filtre par catégorie à partir de la query string
+    category_id = request.GET.get("category")
+    if category_id:
+        products = products.filter(category_id=category_id)
+
     serializer = ProductSerializer(products, many=True, context={'request': request})
     return Response(serializer.data)
+
 
 # Product detail
 @api_view(['GET', 'PUT'])
@@ -289,10 +296,11 @@ def product_rate(request, product_id):
 
 # Order
 # Get Order list or Create Order
+from decimal import Decimal
+
 @api_view(['GET', 'POST'])
-@permission_classes([IsAuthenticated]) # Les commandes ne peuvent être vues/créées que par des utilisateurs authentifiés
+@permission_classes([IsAuthenticated])  # Les commandes ne peuvent être vues/créées que par des utilisateurs authentifiés
 def order_list_create_view(request):
-    
     """
     Liste les commandes de l'utilisateur connecté ou crée une nouvelle commande.
     """
@@ -300,23 +308,50 @@ def order_list_create_view(request):
         client_profile = request.user.client_profile
         print(request.data)
     except Client.DoesNotExist:
-        return Response({"detail": "Profil client non trouvé pour l'utilisateur."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response(
+            {"detail": "Profil client non trouvé pour l'utilisateur."},
+            status=status.HTTP_400_BAD_REQUEST
+        )
 
     if request.method == 'GET':
-        orders = Order.objects.filter(client=client_profile).order_by('-order_date') # Tri par date décroissante
+        orders = Order.objects.filter(client=client_profile).order_by('-order_date')  # Tri par date décroissante
         serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data)
+
     elif request.method == 'POST':
-        # Le corps de la requête devrait contenir une liste de produits avec leurs quantités
-        # Exemple: {"products": [{"product_id": 1, "quantity": 2}, {"product_id": 3, "quantity": 1}]}
-        
+        # Le corps de la requête devrait contenir :
+        # {
+        #   "products": [{ "product_id": 1, "quantity": 2 }, ...],
+        #   "shipping_type": "store" | "home",
+        #   "shipping_cost": 0 ou 5,
+        #   "payment_type": "cash" | "card" | "paypal" | "bank_transfer"
+        # }
         products_data = request.data.get('products', [])
         if not products_data:
-            return Response({"detail": "Aucun produit fourni pour la commande."}, status=status.HTTP_400_BAD_REQUEST)
-        
-        with transaction.atomic(): # Assure l'atomicité de la création de commande
-            order = Order.objects.create(client=client_profile, status='pending')
-            total_amount = 0
+            return Response(
+                {"detail": "Aucun produit fourni pour la commande."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        # Récupération des infos de livraison / paiement
+        shipping_type = request.data.get('shipping_type')  # ex. "store" ou "home"
+        raw_shipping_cost = request.data.get('shipping_cost', 0)
+        try:
+            shipping_cost = Decimal(str(raw_shipping_cost))
+        except Exception:
+            shipping_cost = Decimal('0.00')
+
+        payment_type = request.data.get('payment_type')  # ex. "cash", "card", ...
+
+        with transaction.atomic():  # Assure l'atomicité de la création de commande
+            order = Order.objects.create(
+                client=client_profile,
+                status='pending',
+                shipping_type=shipping_type if hasattr(Order, "shipping_type") else None,
+                shipping_cost=shipping_cost if hasattr(Order, "shipping_cost") else Decimal('0.00'),
+                payment_type=payment_type if hasattr(Order, "payment_type") else None,
+            )
+            total_amount = Decimal('0.00')
 
             for item_data in products_data:
                 product_id = item_data.get('product_id')
@@ -324,27 +359,42 @@ def order_list_create_view(request):
 
                 if not product_id or not quantity or not isinstance(quantity, int) or quantity <= 0:
                     transaction.set_rollback(True)
-                    return Response({"detail": "Données de produit invalides (product_id ou quantity) dans la commande."}, status=status.HTTP_400_BAD_REQUEST)
-                
+                    return Response(
+                        {"detail": "Données de produit invalides (product_id ou quantity) dans la commande."},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+
                 product = get_object_or_404(Product, pk=product_id)
 
                 if product.stock < quantity:
                     transaction.set_rollback(True)
-                    return Response({"detail": f"Stock insuffisant pour le produit {product.name}. Stock disponible: {product.stock}"}, status=status.HTTP_400_BAD_REQUEST)
-                
-                oneself_price = product.current_price # Capture le prix actuel au moment de la commande
+                    return Response(
+                        {
+                            "detail": f"Stock insuffisant pour le produit {product.name}. "
+                                      f"Stock disponible: {product.stock}"
+                        },
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+
+                oneself_price = product.current_price  # Capture le prix actuel au moment de la commande
                 OrderProduct.objects.create(
                     order=order,
                     product=product,
                     quantity=quantity,
                     oneself_price=oneself_price
                 )
+
                 # Utilisation de F() pour une mise à jour atomique du stock
                 Product.objects.filter(pk=product_id).update(stock=F('stock') - quantity)
-                
+
                 total_amount += oneself_price * quantity
-            
+
+            # Ajouter les frais de livraison au total
+            total_amount = total_amount + shipping_cost
+
             order.total_amount = total_amount
+            # Si tu n'as pas ajouté les champs shipping_type / shipping_cost / payment_type
+            # dans le modèle Order, enlève les lignes correspondantes plus haut
             order.save()
 
             serializer = OrderSerializer(order)
@@ -443,6 +493,60 @@ def payment_list_create_view(request, order_pk):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+def order_pay_view(request, order_pk):
+    """
+    Marque une commande comme payée en créant un Payment.
+    Body attendu :
+    {
+      "type": "card" | "paypal" | "cash" | "bank_transfer"
+    }
+    """
+    # retrouver le client
+    try:
+        client_profile = request.user.client_profile
+    except Exception:
+        return Response(
+            {"detail": "Profil client non trouvé pour l'utilisateur."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # vérifier que la commande appartient bien à ce client
+    order = get_object_or_404(Order, pk=order_pk, client=client_profile)
+
+    # optionnel : empêcher de repayer une commande déjà payée
+    if hasattr(order, "payment") and order.payment.status == "paid":
+        return Response(
+            {"detail": "Cette commande est déjà payée."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    payment_type = request.data.get("type", "cash")
+    if payment_type not in ["card", "paypal", "cash", "bank_transfer"]:
+        return Response(
+            {"detail": "Type de paiement invalide."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
+
+    # créer ou mettre à jour le Payment lié à la commande
+    payment, _created = Payment.objects.update_or_create(
+        order=order,
+        defaults={
+            "type": payment_type,
+            "value": order.total_amount,
+            "status": "paid",
+        },
+    )
+
+    # mettre à jour le statut de la commande si tu as un champ 'status'
+    order.status = "paid"
+    order.save()
+
+    # tu peux renvoyer soit la commande, soit le paiement
+    serializer = OrderSerializer(order)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 # Email

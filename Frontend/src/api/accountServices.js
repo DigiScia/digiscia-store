@@ -2,9 +2,7 @@ import api from "./api";
 
 
 export const saveToken = (access,refresh) => {
-    //console.log("access saved =>",access)
-    //console.log("refresh saved =>",refresh)
-    localStorage.setItem("access",access)
+    localStorage.setItem("access_token",access)
     localStorage.setItem("refresh",refresh)
 }
 
@@ -14,18 +12,18 @@ export const login = (username, password) => {
 }
 
 export const logout = () =>{
-    localStorage.removeItem('access');
+    localStorage.removeItem('access_token');
     localStorage.removeItem('refresh');
 }
 
 export const isLogged = () => {
-    let token = localStorage.getItem('access')
+    let token = localStorage.getItem('access_token')
     console.log(token)
     return !!token;
 }
 
 export const getToken = () => {
-    return localStorage.getItem('access');
+    return localStorage.getItem('access_token');
 }
 
 export const signup = async (userData) => {

@@ -8,12 +8,12 @@ class RegisterUserSerializer(serializers.ModelSerializer):
     first_name = serializers.CharField(write_only=True, required=True)
     last_name = serializers.CharField(write_only=True, required=True)
     city = serializers.CharField(write_only=True, required=True)
-    postal_code = serializers.CharField(write_only=True, required=False)
+    adress = serializers.CharField(write_only=True, required=False)
     phone_number = serializers.CharField(write_only=True, required=False)
 
     class Meta:
         model = User
-        fields = ('username', 'email', 'password', 'first_name', 'last_name', 'city', 'postal_code', 'phone_number')
+        fields = ('username', 'email', 'password', 'first_name', 'last_name', 'city', 'adress', 'phone_number')
         extra_kwargs = {'email': {'required': True}}
 
     def create(self, validated_data):
@@ -21,7 +21,7 @@ class RegisterUserSerializer(serializers.ModelSerializer):
         first_name = validated_data.pop('first_name')
         last_name = validated_data.pop('last_name')
         city = validated_data.pop('city')
-        postal_code = validated_data.pop('postal_code')
+        adress = validated_data.pop('adress')
         phone_number = validated_data.pop('phone_number')
 
         # User creation
@@ -36,7 +36,7 @@ class RegisterUserSerializer(serializers.ModelSerializer):
             first_name=first_name,
             last_name=last_name,
             city=city,
-            postal_code=postal_code,
+            adress=adress,
             phone_number=phone_number,
             # fk
             user=user
@@ -81,6 +81,7 @@ class ProductSerializer(serializers.ModelSerializer):
             'adding_date',
             'stock',
             'current_price',
+            "discounted_price",
             'promotion',
             'image',
             'category',
