@@ -1,0 +1,124 @@
+/* PAGE PRODUIT DÉTAIL */
+.product-detail-container {
+  padding: 120px 40px;
+  display: flex;
+  justify-content: center;
+}
+
+.product-detail-content {
+  display: flex;
+  gap: 40px;
+  width: 100%;
+  max-width: 1200px;
+  align-items: flex-start;
+}
+
+.product-detail-image img {
+  width: 450px;
+  height: auto;
+  border-radius: 20px;
+  backdrop-filter: blur(10px);
+}
+
+.product-detail-info {
+  flex: 1;
+  color: #fff;
+}
+
+/* Titre détail */
+.product-detail-title {
+  font-size: 2.4rem;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+/* Catégorie détail */
+.product-detail-category span {
+  color: cyan;
+}
+
+/* Prix détail */
+.product-detail-price {
+  font-size: 2rem;
+  color: cyan;
+  font-weight: bold;
+  margin: 10px 0;
+}
+
+/* Promo détail */
+.product-detail-promo {
+  color: #00e1ff;
+  font-size: 1.2rem;
+}
+
+/* Stock détail */
+.product-detail-stock {
+  margin: 10px 0;
+  color: #ddd;
+}
+
+/* Description détail */
+.product-detail-description {
+  margin-top: 20px;
+  color: #ccc;
+  line-height: 1.6rem;
+}
+
+/* Bouton ajout au panier détail */
+.product-detail-btn-add-cart {
+  margin-top: 30px;
+  background: rgba(0, 255, 255, 0.2);
+  border: 1px solid cyan;
+  padding: 12px 25px;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: 0.3s ease;
+}
+
+.product-detail-btn-add-cart:hover {
+  background: rgba(0, 255, 255, 0.4);
+}
+
+/* Textes de chargement/erreur pour la page détail (optionnel) */
+.product-detail-loading-text,
+.product-detail-error-text {
+  padding: 120px 40px;
+  text-align: center;
+  color: #fff;
+}
+
+/* --- ANCIENS STYLES PARTAGÉS ADAPTÉS (si tu en as besoin ici) --- */
+/* Si tu n’utilises pas ces classes dans ProductDetail.jsx, tu peux les supprimer
+   ou les renommer encore plus spécifiquement. */
+
+/* Lien carte produit (SI tu l’utilises dans cette page, sinon supprime) */
+.product-detail-card-link {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.product-detail-card-link:hover {
+  text-decoration: none;
+}
+
+/* Bouton "Ajouter au panier" (variante globale, si tu en as besoin pour d’autres éléments) */
+.product-detail-add-to-cart-button {
+  margin-top: 10px;
+  background: rgba(0, 255, 255, 0.2);
+  border: 1px solid cyan;
+  padding: 8px 18px;
+  border-radius: 12px;
+  color: #fff;
+  font-size: 0.95rem;
+  cursor: pointer;
+  backdrop-filter: blur(10px);
+  transition: 0.3s ease;
+}
+
+.product-detail-add-to-cart-button:hover {
+  background: rgba(0, 255, 255, 0.4);
+}

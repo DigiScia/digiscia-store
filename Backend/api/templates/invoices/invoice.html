@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    body { font-family: sans-serif; font-size: 12px; }
+    .header { display: flex; justify-content: space-between; align-items: center; }
+    .logo { height: 60px; }
+    .title { font-size: 20px; font-weight: bold; }
+    .section { margin-top: 20px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
+    th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <img src="{{ logo_url }}" class="logo" />
+    <div class="title">Facture</div>
+  </div>
+
+  <div class="section">
+    <p><strong>Commande :</strong> #{{ order.id }}</p>
+    <p><strong>Client :</strong> {{ client_full_name }}</p>
+    <p><strong>Nom d'utilisateur :</strong> {{ client_username }}</p>
+    <p><strong>Type de livraison :</strong> {{ order.get_shipping_type_display }}</p>
+    <p><strong>Type de paiement :</strong> {{ order.get_payment_type_display }}</p>
+    <p><strong>Date commande :</strong> {{ order.order_date }}</p>
+    <p><strong>Livraison prévue :</strong> {{ order.delivery_planned_date }}</p>
+    <p><strong>Livraison :</strong> {{ delivery_info }}</p>
+  </div>
+
+  <div class="section">
+    <h3>Détails de la commande</h3>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Produit</th>
+          <th style="text-align:center;">Qté</th>
+          <th style="text-align:right;">Prix unitaire</th>
+          <th style="text-align:right;">Total</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        {% for op in order_products %}
+        <tr>
+          <td>{{ op.product_name }}</td>
+          <td style="text-align:center;">{{ op.quantity }}</td>
+          <td style="text-align:right;">{{ op.price }} FCFA</td>
+          <td style="text-align:right;">{{ op.line_total }} FCFA</td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="4" style="text-align:center; font-style:italic;">
+            Aucun article dans cette commande
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <div style="margin-top:15px; text-align:right;">
+      <p><strong>Sous-total :</strong> {{ subtotal }} FCFA</p>
+      <p><strong>Frais de livraison :</strong> {{ order.shipping_cost }} FCFA</p>
+      <p><strong>Total :</strong> {{ order.total_amount }} FCFA</p>
+    </div>
+  </div>
+</body>
+</html>
