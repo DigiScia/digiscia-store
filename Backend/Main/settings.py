@@ -35,6 +35,7 @@ ALLOWED_HOSTS = [
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
+    "http://localhost:8080",
 ]
 
 # Application definition
@@ -93,14 +94,18 @@ WSGI_APPLICATION = 'Main.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('DB_NAME'),
-        'USER': config('DB_USER'),
-        'PASSWORD': config('DB_PASSWORD'),
-        'HOST': config('DB_HOST'),
-        'PORT': config('DB_PORT', default='5432'),
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+if config('DATABASE_URL', default=None) or (config('DB_NAME', default=None) and config('USE_POSTGRES', default=False, cast=bool)):
+    # If DATABASE_URL is provided (e.g. on Heroku/Choreo) or USE_POSTGRES is True
+    import dj_database_url
+    DATABASES['default'] = dj_database_url.config(
+        default=f"postgres://{config('DB_USER')}:{config('DB_PASSWORD')}@{config('DB_HOST')}:{config('DB_PORT')}/{config('DB_NAME')}",
+        conn_max_age=600
+    )
 
 
 # Password validation
@@ -225,7 +230,7 @@ JAZZMIN_SETTINGS = {
         "api.Comment": "fas fa-comment",
         "api.Order": "fas fa-shopping-cart",
         "api.Payment": "fas fa-credit-card",
-        "api.OrderProduct": "fas fa-clipboard-list",
+        "api.Subscriber": "fas fa-envelope",
     },
 
     "default_icon_parents": "fas fa-folder",

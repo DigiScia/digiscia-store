@@ -1,7 +1,14 @@
-import Rating from "../Components/Rating";
 import api from "./api";
+ 
+export const getProducts = async () => {
+    const response = await api.get("products/");
+    return response.data;
+};
 
-export const getProducts = await api.get("products/");
+export const getProductById = async (id) => {
+    const response = await api.get(`products/${id}/`);
+    return response.data;
+};
 
 export const searchProduct = async (query) => {
     const response = await api.get(`products/search/?q=${query}`);

@@ -20,7 +20,12 @@ import SearchPage from "./pages/SearchPage.jsx";
 const App = () => {
   return (
       <CartProvider>
-        <Router>
+        <Router
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true,
+          }}
+        >
           <Routes>
               <Route element={<Layout />}>
                 <Route path="/" element={<Home />} />

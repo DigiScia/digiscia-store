@@ -6,3 +6,6 @@ python-decouple
 djangorestframework-simplejwt
 Pillow
 django-jazzmin
+reportlab
+xhtml2pdf
+dj-database-url

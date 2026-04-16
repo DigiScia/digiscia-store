@@ -41,5 +41,8 @@ urlpatterns = [
     # Send emails
     path('send-email/', views.send_email, name='send_email'),
 
+    # Newsletter
+    path('subscribers/', views.subscriber_create_view, name='subscriber_create'),
+
 ]
 

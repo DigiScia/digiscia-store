@@ -1,8 +1,10 @@
-
 import axios from 'axios'
 import { isLogged,getToken } from './accountServices'
+
+const baseURL = 'http://localhost:8000/'
+
 const api = axios.create({
-  baseURL:'http://localhost:8000/',
+  baseURL: baseURL,
   headers:{
     "Content-Type":"application/json",
   }

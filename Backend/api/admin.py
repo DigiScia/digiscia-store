@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Client, Category, Product, Comment, Order, Payment, OrderProduct
+from .models import Client, Category, Product, Comment, Order, Payment, OrderProduct, Subscriber
 from .utils.invoices import generate_invoice_for_payment, send_invoice_email
 from django.contrib import  messages
 from django.utils.html import format_html
@@ -16,24 +16,40 @@ class CategoryAdmin(admin.ModelAdmin):
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('name', 'category', 'stock', 'current_price', 'promotion', 'adding_date')
-    list_filter = ('category', 'adding_date')
-    search_fields = ('name',)
+    list_display = ('product_image', 'name', 'category', 'stock', 'current_price', 'promotion', 'adding_date')
+    list_filter = ('category', 'adding_date', 'promotion')
+    search_fields = ('name', 'description')
+    list_editable = ('stock', 'current_price', 'promotion')
+
+    def product_image(self, obj):
+        if obj.image:
+            return format_html('<img src="{}" style="width: 50px; height: auto; border-radius: 5px;" />', obj.image.url)
+        return "No Image"
+    product_image.short_description = "Image"
 
 @admin.register(Comment)
 class CommentAdmin(admin.ModelAdmin):
     list_display = ('client', 'product', 'created_date')
     search_fields = ('client__user__username', 'product__name')
 
+class OrderProductInline(admin.TabularInline):
+    model = OrderProduct
+    extra = 1
+    readonly_fields = ('oneself_price',)
+
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'client', 'status', 'order_date', 'total_amount')
-    list_filter = ('status', 'order_date')
-    search_fields = ('client__user__username',)
+    list_display = ('id', 'client', 'status', 'order_date', 'total_amount', 'shipping_type', 'payment_type')
+    list_filter = ('status', 'order_date', 'shipping_type', 'payment_type')
+    search_fields = ('client__user__username', 'client__first_name', 'client__last_name', 'id')
+    inlines = [OrderProductInline]
+    list_editable = ('status',)
 
-@admin.register(OrderProduct)
-class OrderProductAdmin(admin.ModelAdmin):
-    list_display = ('order', 'product', 'quantity', 'oneself_price')
+@admin.register(Subscriber)
+class SubscriberAdmin(admin.ModelAdmin):
+    list_display = ('email', 'date_subscribed')
+    search_fields = ('email',)
+    list_filter = ('date_subscribed',)
 
 
 # api/admin.py

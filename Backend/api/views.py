@@ -10,11 +10,11 @@ from django.contrib.auth.models import User
 from django.contrib.auth import authenticate
 from rest_framework_simplejwt.tokens import RefreshToken
 
-from .models import Client, Category, Product, Comment, Order, Payment, OrderProduct
+from .models import Client, Category, Product, Comment, Order, Payment, OrderProduct, Subscriber
 from .serializers import (
     RegisterUserSerializer, ClientSerializer, CategorySerializer,
     ProductSerializer, CommentSerializer, OrderSerializer,
-    PaymentSerializer, OrderProductSerializer
+    PaymentSerializer, OrderProductSerializer, SubscriberSerializer
 )
 
 # Searching 
@@ -569,3 +569,16 @@ def send_email(request):
     )
 
     return Response({'status': 'Email envoyé avec succès'})
+
+
+@api_view(['POST'])
+@permission_classes([AllowAny])
+def subscriber_create_view(request):
+    """
+    Vue pour l'inscription à la newsletter.
+    """
+    serializer = SubscriberSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
