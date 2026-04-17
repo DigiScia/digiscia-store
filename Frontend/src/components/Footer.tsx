@@ -35,7 +35,7 @@ const Footer = () => (
 
       <div className="border-t border-border/40 pt-6 flex flex-col sm:flex-row items-center justify-between gap-4">
         <p className="text-xs text-muted-foreground">
-          © 2026 DigiScia Store. Tous droits réservés.
+          © {new Date().getFullYear()} DigiScia Store. Tous droits réservés.
         </p>
         <p className="text-xs text-muted-foreground">
           Développé par <a href="https://digiscia.com" className="text-primary hover:underline">DigiScia</a>

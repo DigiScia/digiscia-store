@@ -8,3 +8,24 @@ __pycache__/
 venv/
 env/
 media/
+
+# === Fichiers de cache ===
+*.cache
+
+# === Fichiers de base de données SQLite ===
+*.db
+
+# === Fichiers de logs ===
+*.log
+
+# === Fichiers de tests ===
+*.test
+
+# === Fichiers de documentation ===
+*.md
+
+# === Fichiers de configuration ===
+*.conf
+
+# === Fichiers de déploiement ===
+*.deploy

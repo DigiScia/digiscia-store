@@ -51,7 +51,10 @@ const HeroSection = () => {
                 Explorer la boutique
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </button>
-              <button className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium text-sm text-foreground glass glass-hover">
+              <button 
+                onClick={() => navigate("/products")}
+                className="inline-flex items-center gap-2 px-6 py-3 rounded-lg font-medium text-sm text-foreground glass glass-hover"
+              >
                 Meilleures ventes
               </button>
             </div>
