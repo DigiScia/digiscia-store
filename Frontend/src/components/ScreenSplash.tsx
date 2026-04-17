@@ -9,7 +9,7 @@ interface ScreenSplashProps {
 
 const ScreenSplash: React.FC<ScreenSplashProps> = ({
   isLoading,
-  message = "Initialisation",
+  message = "Chargement ...",
   isInitial = false,
 }) => {
   return (

@@ -5,7 +5,7 @@ const items = [
   { icon: Truck, title: "Livraison rapide", desc: "24-48h partout" },
   { icon: ShieldCheck, title: "Paiement à la livraison", desc: "100% sécurisé" },
   { icon: RefreshCw, title: "Retour sous 14 jours", desc: "Satisfait ou remboursé" },
-  { icon: Headphones, title: "Support 24/7", desc: "Toujours disponible" },
+  { icon: Headphones, title: "Support 24/7", desc: "Disponible 24/7" },
 ];
 
 const TrustBar = () => (
