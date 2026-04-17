@@ -76,6 +76,9 @@ class PaymentAdmin(admin.ModelAdmin):
         "send_invoice_with_pdf",
     )
 
+    class Media:
+        js = ('api/js/payment_auto_fill.js',)
+
     # -----------------------------
     # Boutons dans la liste
     # -----------------------------

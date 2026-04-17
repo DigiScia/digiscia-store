@@ -1,7 +1,8 @@
-from django.db.models.signals import post_save, pre_save
+from django.db.models.signals import post_save, pre_save, post_delete
 from django.dispatch import receiver
 from .models import Order, Payment, OrderProduct
-from .utils.emails import send_order_confirmation, send_status_update, send_payment_receipt
+from .tasks import async_send_order_confirmation, async_send_status_update, async_send_payment_receipt
+
 
 @receiver(pre_save, sender=Order)
 def order_pre_save(sender, instance, **kwargs):
@@ -31,12 +32,12 @@ def order_post_save_notifications(sender, instance, created, **kwargs):
     """
     # 1. Order Confirmation (first time products are added)
     if getattr(instance, '_should_send_confirmation', False):
-        send_order_confirmation(instance)
+        async_send_order_confirmation.delay(instance.pk)
         instance._should_send_confirmation = False
     
     # 2. Status Update
     if not created and getattr(instance, '_status_changed', False):
-        send_status_update(instance)
+        async_send_status_update.delay(instance.pk)
         instance._status_changed = False
 
 @receiver(post_save, sender=Payment)
@@ -45,10 +46,9 @@ def payment_post_save(sender, instance, created, **kwargs):
     Triggers payment confirmation and receipt email.
     """
     if created:
-        # Generate and send receipt
-        send_payment_receipt(instance)
+        # Generate and send receipt asynchronously
+        async_send_payment_receipt.delay(instance.pk)
 
-from django.db.models.signals import post_delete
 
 @receiver(post_save, sender=OrderProduct)
 @receiver(post_delete, sender=OrderProduct)

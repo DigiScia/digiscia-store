@@ -43,6 +43,7 @@ urlpatterns = [
 
     # Newsletter
     path('subscribers/', views.subscriber_create_view, name='subscriber_create'),
+    path('order-total/<int:pk>/', views.order_total_json, name='order-total'),
 
 ]
 

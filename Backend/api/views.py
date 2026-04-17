@@ -116,9 +116,12 @@ def client_detail_view(request):
 
 
 
+from django.views.decorators.cache import cache_page
+
 # Other views
 # Category
 # Get Category list
+@cache_page(60 * 5) # Cache for 5 minutes
 @api_view(['GET'])
 @permission_classes([AllowAny]) # GET pour tous, POST pour IsAdminUser
 def category_list_view(request):
@@ -143,13 +146,14 @@ def category_detail_view(request, pk):
 
 # Product
 # Get product list
+@cache_page(60 * 5) # Cache for 5 minutes
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def product_list_view(request):
     """
     Liste tous les produits, avec filtre par catégorie si ?category=<id> est fourni.
     """
-    products = Product.objects.all()
+    products = Product.objects.select_related('category').all()
 
     # 🔹 Filtre par catégorie à partir de la query string
     category_id = request.GET.get("category")
@@ -314,7 +318,9 @@ def order_list_create_view(request):
         )
 
     if request.method == 'GET':
-        orders = Order.objects.filter(client=client_profile).order_by('-order_date')  # Tri par date décroissante
+        orders = Order.objects.filter(client=client_profile)\
+                             .prefetch_related('order_products__product')\
+                             .order_by('-order_date')  # Tri par date décroissante
         serializer = OrderSerializer(orders, many=True)
         return Response(serializer.data)
 
@@ -582,3 +588,12 @@ def subscriber_create_view(request):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def order_total_json(request, pk):
+    """
+    Endpoint interne pour récupérer le total d'une commande (utile pour l'admin).
+    """
+    order = get_object_or_404(Order, pk=pk)
+    return Response({"total_amount": order.total_amount})

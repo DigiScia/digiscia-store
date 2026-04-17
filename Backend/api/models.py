@@ -140,6 +140,12 @@ class Payment(models.Model):
     order = models.OneToOneField(Order, on_delete=models.CASCADE, related_name="payment")
     invoice_pdf = models.FileField(upload_to="invoices/", null=True, blank=True)
     invoice_sent = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        if not self.value and self.order:
+            self.value = self.order.total_amount
+        super().save(*args, **kwargs)
+
     def __str__(self):
         return f"Payment for Order #{self.order.id}" #- {self.status}"
 
