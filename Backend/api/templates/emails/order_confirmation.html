@@ -1,0 +1,41 @@
+{% extends "emails/base_email.html" %}
+
+{% block content %}
+    <h2 style="color: #6366f1; margin-top: 0;">Merci pour votre confiance !</h2>
+    <p>Bonjour <span class="accent">{{ client.first_name }}</span>,</p>
+    <p>Nous avons bien reçu votre commande <span class="accent">#{{ order.id }}</span>.</p>
+    
+    <div class="divider"></div>
+    
+    <h3>Récapitulatif de la commande</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Article</th>
+                <th>Quantité</th>
+                <th>Prix</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in products %}
+            <tr>
+                <td>{{ item.product.name }}</td>
+                <td>{{ item.quantity }}</td>
+                <td>{{ item.oneself_price }} FCFA</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <div style="text-align: right; margin-top: 20px;">
+        <p style="font-size: 18px; font-weight: 800;">Total : {{ order.total_amount }} FCFA</p>
+    </div>
+    
+    <div class="divider"></div>
+    
+    <p>Dès que votre commande sera traitée, vous recevrez une nouvelle notification.</p>
+    
+    <div style="text-align: center;">
+        <a href="http://localhost:8080/products" class="button">Retourner à la boutique</a>
+    </div>
+{% endblock %}

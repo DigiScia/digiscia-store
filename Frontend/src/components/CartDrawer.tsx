@@ -122,7 +122,9 @@ const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                                 <Trash2 className="w-4 h-4" />
                               </button>
                             </div>
-                            <p className="text-[10px] font-bold text-primary uppercase tracking-widest mt-1 opacity-70">{item.category}</p>
+                            <p className="text-[10px] font-bold text-primary uppercase tracking-widest mt-1 opacity-70">
+                              {typeof item.category === 'object' ? (item.category as any).name : item.category}
+                            </p>
                           </div>
                           
                           <div className="flex items-center justify-between mt-auto">

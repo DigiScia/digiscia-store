@@ -6,8 +6,8 @@ from django.utils.html import format_html
 
 @admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):
-    list_display = ('first_name', 'last_name', 'city', 'phone_number', 'sign_in_date', 'adress', 'user')
-    search_fields = ('first_name', 'last_name', 'city', 'user__username')
+    list_display = ('first_name', 'last_name', 'email', 'city', 'phone_number', 'sign_in_date', 'adress', 'user')
+    search_fields = ('first_name', 'last_name', 'email', 'city', 'user__username')
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
@@ -148,9 +148,10 @@ class PaymentAdmin(admin.ModelAdmin):
 
         for payment in queryset:
             try:
-                user = payment.order.client.user
+                client = payment.order.client
+                recipient_email = payment.order.client.email
 
-                if not user.email:
+                if not recipient_email:
                     skipped += 1
                     continue
 

@@ -1,0 +1,22 @@
+{% extends "emails/base_email.html" %}
+
+{% block content %}
+    <h2 style="color: #6366f1; margin-top: 0;">Paiement confirmé !</h2>
+    <p>Bonjour <span class="accent">{{ client.first_name }}</span>,</p>
+    <p>Nous vous confirmons avoir reçu le paiement pour votre commande <span class="accent">#{{ order.id }}</span>.</p>
+    
+    <div style="background-color: #ecfdf5; border-left: 4px solid #10b981; padding: 20px; margin: 30px 0;">
+        <p style="margin: 0; font-weight: 600;">Montant réglé : {{ payment.value }} FCFA</p>
+        <p style="margin: 5px 0 0 0; font-size: 14px; color: #065f46;">Mode de paiement : {{ payment.get_type_display }}</p>
+    </div>
+    
+    <p>Votre facture est jointe à cet email au format PDF.</p>
+    
+    <div class="divider"></div>
+    
+    <p>Nous préparons l'expédition de votre commande avec le plus grand soin.</p>
+    
+    <div style="text-align: center;">
+        <a href="http://localhost:8080/profile" class="button">Gérer mes commandes</a>
+    </div>
+{% endblock %}

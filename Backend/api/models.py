@@ -15,6 +15,7 @@ class Client(models.Model):
     phone_number = models.CharField(max_length=10)
     sign_in_date = models.DateField(auto_now_add=True)
     adress= models.CharField(max_length=256,blank=True )
+    email = models.EmailField(max_length=256, blank=True, null=True)
     # fk
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="client_profile")
 
@@ -106,6 +107,14 @@ class Order(models.Model):
     # fk
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name="orders")
 
+    def update_total(self):
+        """
+        Recalcule le montant total de la commande.
+        """
+        products_total = sum(op.oneself_price * op.quantity for op in self.order_products.all())
+        self.total_amount = products_total + self.shipping_cost
+        self.save()
+
     def __str__(self):
         return f"Order #{self.id} - {self.client.user.username}"
 
@@ -148,6 +157,11 @@ class OrderProduct(models.Model):
     class Meta:
         # Assure qu'un produit ne peut être ajouté qu'une seule fois par commande (la quantité est mise à jour)
         unique_together = ('order', 'product')
+
+    def save(self, *args, **kwargs):
+        if not self.oneself_price and self.product:
+            self.oneself_price = self.product.current_price
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"{self.quantity} x {self.product.name} in Order #{self.order.id}"

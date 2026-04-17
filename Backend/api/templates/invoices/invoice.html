@@ -3,13 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <style>
-    body { font-family: sans-serif; font-size: 12px; }
-    .header { display: flex; justify-content: space-between; align-items: center; }
-    .logo { height: 60px; }
-    .title { font-size: 20px; font-weight: bold; }
+    body { font-family: sans-serif; font-size: 11px; color: #1e293b; }
+    .header { margin-bottom: 30px; }
+    .title { font-size: 24px; font-weight: bold; color: #6366f1; }
     .section { margin-top: 20px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-    th, td { border: 1px solid #ccc; padding: 6px; text-align: left; }
+    table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+    th { background-color: #f1f5f9; border-bottom: 2px solid #6366f1; padding: 8px; text-align: left; }
+    td { border-bottom: 1px solid #e2e8f0; padding: 8px; text-align: left; }
+    .total-box { margin-top: 20px; text-align: right; border-top: 2px solid #10b981; padding-top: 10px; }
+    .accent { color: #6366f1; font-weight: bold; }
   </style>
 </head>
 <body>
@@ -60,10 +62,10 @@
       </tbody>
     </table>
 
-    <div style="margin-top:15px; text-align:right;">
+    <div class="total-box">
       <p><strong>Sous-total :</strong> {{ subtotal }} FCFA</p>
       <p><strong>Frais de livraison :</strong> {{ order.shipping_cost }} FCFA</p>
-      <p><strong>Total :</strong> {{ order.total_amount }} FCFA</p>
+      <p style="font-size: 16px; color: #10b981;"><strong>Total : {{ order.total_amount }} FCFA</strong></p>
     </div>
   </div>
 </body>

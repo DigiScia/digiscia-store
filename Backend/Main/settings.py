@@ -161,8 +161,8 @@ EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-EMAIL_HOST_USER = "siehonarcisse@gmail.com"
-EMAIL_HOST_PASSWORD = "tvpdurzykeefjtgh"
+EMAIL_HOST_USER = "yonlifidelis2@gmail.com"
+EMAIL_HOST_PASSWORD = "mkrg phud bdjz qgen"
 
 DEFAULT_FROM_EMAIL = f"DigiScia <{EMAIL_HOST_USER}>"
 

@@ -17,6 +17,7 @@ from xhtml2pdf import pisa
 
 def build_invoice_context(payment):
     order = payment.order
+    recipient_email = payment.order.client.email
     client = order.client
     user = client.user
 
@@ -97,7 +98,7 @@ def send_invoice_email(payment):
         subject=subject,
         body=text_body,
         from_email=settings.DEFAULT_FROM_EMAIL,
-        to=[payment.order.client.user.email],
+        to=[payment.order.client.email],
     )
     payment.invoice_pdf.open("rb")
     email.attach(

@@ -38,14 +38,21 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, [cart]);
 
   const addToCart = (product: Product, quantity: number = 1) => {
+    // Normalize product data for the cart (handle backend objects)
+    const normalizedProduct = {
+      ...product,
+      category: typeof product.category === 'object' ? (product.category as any).name : product.category,
+      price: (product as any).price || (product as any).discounted_price || (product as any).current_price
+    };
+
     setCart((prev) => {
-      const existingItem = prev.find((item) => item.id === product.id);
+      const existingItem = prev.find((item) => item.id === normalizedProduct.id);
       if (existingItem) {
         return prev.map((item) =>
-          item.id === product.id ? { ...item, quantity: item.quantity + quantity } : item
+          item.id === normalizedProduct.id ? { ...item, quantity: item.quantity + quantity } : item
         );
       }
-      return [...prev, { ...product, quantity }];
+      return [...prev, { ...normalizedProduct, quantity }];
     });
   };
 
