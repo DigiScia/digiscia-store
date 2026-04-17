@@ -1,8 +1,14 @@
 from django.contrib import admin
-from .models import Client, Category, Product, Comment, Order, Payment, OrderProduct, Subscriber
+from .models import Client, Category, Product, Comment, Order, Payment, OrderProduct, Subscriber, Deliverer
 from .utils.invoices import generate_invoice_for_payment, send_invoice_email
 from django.contrib import  messages
 from django.utils.html import format_html
+
+@admin.register(Deliverer)
+class DelivererAdmin(admin.ModelAdmin):
+    list_display = ('name', 'phone_number', 'is_active')
+    search_fields = ('name', 'phone_number')
+    list_filter = ('is_active',)
 
 @admin.register(Client)
 class ClientAdmin(admin.ModelAdmin):
@@ -39,11 +45,11 @@ class OrderProductInline(admin.TabularInline):
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):
-    list_display = ('id', 'client', 'status', 'order_date', 'total_amount', 'shipping_type', 'payment_type')
-    list_filter = ('status', 'order_date', 'shipping_type', 'payment_type')
-    search_fields = ('client__user__username', 'client__first_name', 'client__last_name', 'id')
+    list_display = ('id', 'client', 'deliverer', 'status', 'order_date', 'total_amount', 'shipping_type', 'payment_type')
+    list_filter = ('status', 'order_date', 'shipping_type', 'payment_type', 'deliverer')
+    search_fields = ('client__user__username', 'client__first_name', 'client__last_name', 'id', 'deliverer__name')
     inlines = [OrderProductInline]
-    list_editable = ('status',)
+    list_editable = ('status', 'deliverer')
 
 @admin.register(Subscriber)
 class SubscriberAdmin(admin.ModelAdmin):

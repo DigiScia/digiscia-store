@@ -217,12 +217,13 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # Chemin physique pour stocker les 
 
 # styling
 JAZZMIN_SETTINGS = {
-    "site_title": "DigiScia Admin",
-    "site_header": "DigiScia",
-    "site_brand": "DigiScia Admin",
-    "site_logo": None,
-    "welcome_sign": "Bienvenue sur la plateforme d'administration DigiScia",
-    "copyright": "DigiScia",
+    "site_title": "DigiScia Store",
+    "site_header": "DigiScia Store",
+    "site_brand": "DigiScia Store",
+    "site_logo": "api/img/logo.svg",
+    "login_logo": "api/img/logo.svg",
+    "welcome_sign": "Bienvenue sur la plateforme d'administration DigiScia Store",
+    "copyright": "DigiScia Store",
     
     "search_model": ["auth.User", "api.Product"],
 
@@ -250,6 +251,7 @@ JAZZMIN_SETTINGS = {
         "api.Order": "fas fa-shopping-cart",
         "api.Payment": "fas fa-credit-card",
         "api.Subscriber": "fas fa-envelope",
+        "api.Deliverer": "fas fa-truck",
     },
 
     "default_icon_parents": "fas fa-folder",
@@ -263,6 +265,38 @@ JAZZMIN_SETTINGS = {
     
     # Optionnel : empêche d'afficher le bouton "UI Builder" si présent
     "show_ui_builder": False,
+}
+
+JAZZMIN_UI_TWEAKS = {
+    "navbar_small_text": False,
+    "footer_small_text": False,
+    "body_small_text": False,
+    "brand_small_text": False,
+    "brand_colour": "navbar-indigo",
+    "accent": "accent-emerald",
+    "navbar": "navbar-dark",
+    "no_navbar_border": False,
+    "navbar_fixed": False,
+    "layout_boxed": False,
+    "footer_fixed": False,
+    "sidebar_fixed": False,
+    "sidebar": "sidebar-dark-indigo",
+    "sidebar_nav_small_text": False,
+    "sidebar_disable_expand": False,
+    "sidebar_nav_child_indent": False,
+    "sidebar_nav_compact_style": False,
+    "sidebar_nav_legacy_style": False,
+    "sidebar_nav_flat_style": False,
+    "theme": "flatly",
+    "dark_mode_theme": "darkly",
+    "button_classes": {
+        "primary": "btn-outline-primary",
+        "secondary": "btn-outline-secondary",
+        "info": "btn-info",
+        "warning": "btn-warning",
+        "danger": "btn-danger",
+        "success": "btn-emerald"
+    }
 }
 
 

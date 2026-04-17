@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Client, Category, Product, Comment, Order, Payment, OrderProduct, Subscriber
+from .models import Client, Category, Product, Comment, Order, Payment, OrderProduct, Subscriber, Deliverer
 
 # Sign in
 class RegisterUserSerializer(serializers.ModelSerializer):
@@ -124,15 +124,23 @@ class OrderProductSerializer(serializers.ModelSerializer):
         read_only_fields = ('oneself_price',)
 
 
+
+# Deliverer Serializer
+class DelivererSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Deliverer
+        fields = '__all__'
+
 # Order Serializer
 class OrderSerializer(serializers.ModelSerializer):
     order_products = OrderProductSerializer(many=True, read_only=True) # Liste des produits dans la commande
     client_username = serializers.CharField(source='client.user.username', read_only=True)
     payment_status = serializers.CharField(source='payment.status', read_only=True) # Affiche le statut du paiement
+    deliverer = DelivererSerializer(read_only=True) # Info du livreur
 
     class Meta:
         model = Order
-        fields = ('id', 'status', 'order_date', 'client', 'client_username', 'total_amount', 'order_products', 'payment_status','delivery_planned_date','delivery_date')
+        fields = ('id', 'status', 'order_date', 'client', 'client_username', 'total_amount', 'order_products', 'payment_status','delivery_planned_date','delivery_date', 'deliverer')
         read_only_fields = ('client', 'total_amount', 'order_date')
 
 # Payment serializer
