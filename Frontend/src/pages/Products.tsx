@@ -5,16 +5,11 @@ import Footer from "@/components/Footer";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import { useSearchParams } from "react-router-dom";
-import { 
-  Select, 
-  SelectContent, 
-  SelectItem, 
-  SelectTrigger, 
-  SelectValue 
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, FilterX, Loader2 } from "lucide-react";
 import { getProducts } from "@/api/product";
 import { getCategories } from "@/api/category";
+import ScreenSplash from "@/components/ScreenSplash";
 
 const Products = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -78,12 +73,7 @@ const Products = () => {
   };
 
   if (loading) {
-      return (
-          <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
-              <Loader2 className="w-10 h-10 animate-spin text-primary" />
-              <p className="text-muted-foreground animate-pulse">Configuration de l'inventaire...</p>
-          </div>
-      );
+    return <ScreenSplash isLoading={loading} message="Chargement de l'inventaire" />;
   }
 
   return (
